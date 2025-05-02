@@ -53,7 +53,13 @@ class ShowController extends Controller
 
     public function show(Show $show)
     {
-        $show->load(['comments.user', 'favorites']);
+        $show->load([
+            'comments' => function ($query) {
+                $query->latest();
+            },
+            'comments.user',
+            'favorites'
+        ]);
         return view('shows.show', compact('show'));
     }
 
@@ -129,7 +135,7 @@ class ShowController extends Controller
 
     public function destroy(Show $show)
     {
-        $this->authorize('delete', $show);
+        \Illuminate\Support\Facades\Gate::authorize('delete', $show);
         $show->delete();
 
         return redirect()->route('home')->with('success', 'Show/Movie deleted successfully.');
